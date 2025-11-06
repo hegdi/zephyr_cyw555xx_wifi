@@ -1,0 +1,72 @@
+/ {
+	aliases {
+		sdhc0 = &sdhc;
+	};
+
+    chosen {
+        zephyr,bt-hci = &bt_hci;
+    };
+};
+
+&usart2 {
+    status = "okay";
+    /* The UART bus speed (current_speed) for zephyr_bt_uart should be the same
+     * as the default baudrate defined in CYW43xx firmware (default 115200).
+     */
+
+    current-speed = <115200>;
+    hw-flow-control;
+
+    /* HCI-UART pins*/
+    pinctrl-0 = <&usart2_rx_pd6 &usart2_tx_pd5 &usart2_rts_pd4 &usart2_cts_pd3>;
+    pinctrl-names = "default";
+
+    bt_hci: bt_hci {
+        status = "okay";
+        compatible = "zephyr,bt-hci-uart";
+
+        cyw555xx {
+        compatible = "infineon,cyw43xxx-bt-hci";
+        bt-reg-on-gpios = <&gpiog 3 GPIO_ACTIVE_HIGH>;
+
+        /* Configuration UART speeds for firmware download (fw-download-speed) and
+         * HCI operation (hci-operation-speed).
+         * If hci-operation-speed or fw-download-speed are not defined in bt-hci{...}
+         * node, cyw43xx driver will use bus/current-speed as default speed.
+         */
+        fw-download-speed   = <921600>;
+        hci-operation-speed = <921600>;
+        };
+    };
+};
+
+sdhc: &sdmmc1 {
+	compatible = "st,stm32-sdio";
+	interrupts = <49 0>;
+	interrupt-names = "event";
+    /* SDIO pins */
+    pinctrl-0 = <&sdmmc1_d0_pc8
+        &sdmmc1_d1_pc9
+        &sdmmc1_d2_pc10
+        &sdmmc1_d3_pc11
+        &sdmmc1_ck_pc12
+        &sdmmc1_cmd_pd2>;
+    pinctrl-names = "default";
+/*	sdhi-on-gpios = <&gpiod 11 GPIO_ACTIVE_HIGH>; */
+	min-bus-freq = <DT_FREQ_K(400)>;
+	max-bus-freq = <DT_FREQ_M(208)>;
+/*	hw-flow-control; */
+	bus-width = <4>;
+    status = "okay";
+
+    /* Wifi configuration */
+    wifi: airoc-wifi {
+      status = "okay";
+      compatible = "infineon,airoc-wifi";
+
+      /* Wi-Fi control gpios */
+      wifi-reg-on-gpios    = <&gpiod 0 GPIO_ACTIVE_HIGH>;
+      wifi-host-wake-gpios = <&gpiod 1 GPIO_ACTIVE_HIGH>;
+    };
+};
+

@@ -1,0 +1,25 @@
+
+menuconfig CUSTOM_WIFI_AIROC
+    bool "Custom Infineon AIROC SoC Wi-Fi Module support"
+    depends on DT_HAS_INFINEON_AIROC_WIFI_ENABLED
+    select AIROC_WIFI_CUSTOM
+    default no
+
+
+if CUSTOM_WIFI_AIROC
+
+choice CUSTOM_AIROC_PART
+    prompt "Select AIROC part"
+config CUSTOM_CYW55500
+    bool "CYW55500"
+    select AIROC_WIFI6
+config CUSTOM_CYW55572
+    bool "CYW55572"
+    select AIROC_WIFI6
+endchoice
+
+endif # CUSTOM_WIFI_AIROC
+
+source "Kconfig.zephyr"
+
+
